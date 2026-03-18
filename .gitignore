@@ -1,0 +1,19 @@
+# 忽略一切，仅跟踪 Avalonia 版本
+.DS_Store
+*
+!.gitignore
+!AvaloniaMerge.sln
+!README.md
+!AvaloniaMerge.Core/
+!AvaloniaMerge.Core/**
+!AvaloniaMerge.Cli/
+!AvaloniaMerge.Cli/**
+!AvaloniaMerge.Gui/
+!AvaloniaMerge.Gui/**
+AvaloniaMerge.Core/**/bin/
+AvaloniaMerge.Core/**/obj/
+AvaloniaMerge.Cli/**/bin/
+AvaloniaMerge.Cli/**/obj/
+AvaloniaMerge.Gui/**/bin/
+AvaloniaMerge.Gui/**/obj/
+**/.DS_Store

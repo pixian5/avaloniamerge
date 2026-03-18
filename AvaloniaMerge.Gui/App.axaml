@@ -1,0 +1,55 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaMerge.Gui.App"
+             RequestedThemeVariant="Light">
+    <Application.Resources>
+        <LinearGradientBrush x:Key="AppBackground" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FDF4ED" Offset="0" />
+            <GradientStop Color="#E8F3F5" Offset="0.55" />
+            <GradientStop Color="#F4F7F1" Offset="1" />
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="CardBackground" Color="#FFF9F3" />
+        <SolidColorBrush x:Key="CardBorder" Color="#E5E7EB" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#0F766E" />
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#5E6B6B" />
+        <SolidColorBrush x:Key="DiffAddedBrush" Color="#D1FAE5" />
+        <SolidColorBrush x:Key="DiffRemovedBrush" Color="#FEE2E2" />
+        <SolidColorBrush x:Key="DiffUnchangedBrush" Color="#F3F4F6" />
+        <SolidColorBrush x:Key="DiffModifiedBrush" Color="#FEF3C7" />
+        <SolidColorBrush x:Key="StatusLeftBrush" Color="#DBEAFE" />
+        <SolidColorBrush x:Key="StatusRightBrush" Color="#FEE2E2" />
+        <SolidColorBrush x:Key="StatusSameBrush" Color="#DCFCE7" />
+        <SolidColorBrush x:Key="StatusDiffBrush" Color="#FEF3C7" />
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{DynamicResource AppBackground}" />
+            <Setter Property="FontFamily" Value="Avenir Next, Futura, Noto Sans, Segoe UI" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.subtle">
+            <Setter Property="Background" Value="#EEF2F3" />
+            <Setter Property="Foreground" Value="#243030" />
+        </Style>
+        <Style Selector="TextBox">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="10,6" />
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="8,6" />
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="Padding" Value="12,6" />
+        </Style>
+    </Application.Styles>
+</Application>
