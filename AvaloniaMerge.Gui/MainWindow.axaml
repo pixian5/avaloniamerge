@@ -32,12 +32,12 @@
                 </Grid>
 
                 <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="8">
-                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource MutedTextBrush}" />
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource MutedTextBrush}" IsVisible="{Binding HasStatusMessage}" />
                     <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTab}">
                         <TabItem Header="目录差异">
                             <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
                                 <Grid RowDefinitions="Auto,*" RowSpacing="12">
-                                    <StackPanel Orientation="Horizontal" Spacing="12">
+                                    <WrapPanel Orientation="Horizontal" ItemWidth="NaN">
                                         <TextBlock Text="筛选" VerticalAlignment="Center" />
                                         <ComboBox ItemsSource="{Binding DirectoryFilterOptions}" SelectedItem="{Binding DirectoryFilter}" Width="120" />
                                         <TextBlock Text="比较方法" VerticalAlignment="Center" />
@@ -49,7 +49,7 @@
                                         <CheckBox Content="忽略大小写" IsChecked="{Binding IgnoreCase}" VerticalAlignment="Center" />
                                         <CheckBox Content="降序" IsChecked="{Binding DirectorySortDescending}" VerticalAlignment="Center" />
                                         <TextBlock Text="{Binding DirectoryCountText}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
-                                    </StackPanel>
+                                    </WrapPanel>
 
                                     <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="6">
                                         <Border Background="#F3F4F6" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="8,6">
