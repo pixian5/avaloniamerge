@@ -79,8 +79,16 @@ public sealed class MainViewModel : ViewModelBase
     public string Summary
     {
         get => _summary;
-        set => SetField(ref _summary, value);
+        set
+        {
+            if (SetField(ref _summary, value))
+            {
+                OnPropertyChanged(nameof(HasSummary));
+            }
+        }
     }
+
+    public bool HasSummary => !string.IsNullOrWhiteSpace(Summary);
 
     public int SelectedTab
     {
