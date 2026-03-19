@@ -9,7 +9,7 @@ public sealed class MainViewModel : ViewModelBase
 {
     private string _leftPath = string.Empty;
     private string _rightPath = string.Empty;
-    private CompareMode _mode = CompareMode.Auto;
+    private CompareTargetOption _selectedCompareTarget;
     private bool _ignoreCase;
     private string _statusMessage = "请选择左右路径并开始对比。";
     private string _summary = string.Empty;
@@ -25,7 +25,12 @@ public sealed class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        Modes = Enum.GetValues<CompareMode>();
+        CompareTargets = new List<CompareTargetOption>
+        {
+            new("自动识别", CompareMode.Auto),
+            new("文件差异", CompareMode.File),
+            new("目录差异", CompareMode.Directory)
+        };
         DirectoryFilterOptions = new List<string> { "不同", "全部", "相同", "新增", "删除", "修改", "类型" };
         DirectorySortOptions = new List<string> { "相对路径", "状态", "左大小", "右大小", "左修改时间", "右修改时间" };
         DirectoryCompareMethods = new List<CompareMethodOption>
@@ -35,10 +40,11 @@ public sealed class MainViewModel : ViewModelBase
             new("大小+修改时间", DirectoryCompareMethod.SizeAndModifiedTime),
             new("完整对比", DirectoryCompareMethod.Full)
         };
+        _selectedCompareTarget = CompareTargets[0];
         _selectedDirectoryCompareMethod = DirectoryCompareMethods.Last();
     }
 
-    public IReadOnlyList<CompareMode> Modes { get; }
+    public IReadOnlyList<CompareTargetOption> CompareTargets { get; }
     public IReadOnlyList<string> DirectoryFilterOptions { get; }
     public IReadOnlyList<string> DirectorySortOptions { get; }
     public IReadOnlyList<CompareMethodOption> DirectoryCompareMethods { get; }
@@ -59,10 +65,10 @@ public sealed class MainViewModel : ViewModelBase
         set => SetField(ref _rightPath, value);
     }
 
-    public CompareMode Mode
+    public CompareTargetOption SelectedCompareTarget
     {
-        get => _mode;
-        set => SetField(ref _mode, value);
+        get => _selectedCompareTarget;
+        set => SetField(ref _selectedCompareTarget, value);
     }
 
     public bool IgnoreCase
@@ -185,7 +191,7 @@ public sealed class MainViewModel : ViewModelBase
                 DirectoryCompareMethod = SelectedDirectoryCompareMethod.Method
             };
 
-            var result = await Task.Run(() => DiffEngine.Compare(LeftPath, RightPath, Mode, options));
+            var result = await Task.Run(() => DiffEngine.Compare(LeftPath, RightPath, SelectedCompareTarget.Mode, options));
 
             if (result.Kind == ComparisonKind.File && result.File is not null)
             {
@@ -491,6 +497,20 @@ public sealed class MainViewModel : ViewModelBase
 
         public string DisplayName { get; }
         public DirectoryCompareMethod Method { get; }
+
+        public override string ToString() => DisplayName;
+    }
+
+    public sealed class CompareTargetOption
+    {
+        public CompareTargetOption(string displayName, CompareMode mode)
+        {
+            DisplayName = displayName;
+            Mode = mode;
+        }
+
+        public string DisplayName { get; }
+        public CompareMode Mode { get; }
 
         public override string ToString() => DisplayName;
     }
