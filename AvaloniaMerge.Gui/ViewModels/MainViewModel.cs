@@ -21,7 +21,6 @@ public sealed class MainViewModel : ViewModelBase
     private string _directoryCountText = "总数 0 | 相同 0 | 不同 0";
     private readonly List<DirectoryItemViewModel> _allDirectoryItems = new();
     private CompareMethodOption _selectedDirectoryCompareMethod;
-    private ComparisonKind? _autoResolvedKind;
 
     public MainViewModel()
     {
@@ -90,10 +89,6 @@ public sealed class MainViewModel : ViewModelBase
     public bool HasFileDiff => FileDiffLines.Count > 0;
 
     public bool HasDirectoryDiff => DirectoryItems.Count > 0;
-
-    public bool HasAutoFileDiff => _autoResolvedKind == ComparisonKind.File && HasFileDiff;
-
-    public bool HasAutoDirectoryDiff => _autoResolvedKind == ComparisonKind.Directory && HasDirectoryDiff;
 
     public CompareMethodOption SelectedDirectoryCompareMethod
     {
@@ -169,12 +164,9 @@ public sealed class MainViewModel : ViewModelBase
         FileDiffLines.Clear();
         DirectoryItems.Clear();
         _allDirectoryItems.Clear();
-        _autoResolvedKind = null;
         DirectoryCountText = "总数 0 | 相同 0 | 不同 0";
         OnPropertyChanged(nameof(HasFileDiff));
         OnPropertyChanged(nameof(HasDirectoryDiff));
-        OnPropertyChanged(nameof(HasAutoFileDiff));
-        OnPropertyChanged(nameof(HasAutoDirectoryDiff));
 
         try
         {
@@ -188,7 +180,6 @@ public sealed class MainViewModel : ViewModelBase
 
             if (result.Kind == ComparisonKind.File && result.File is not null)
             {
-                _autoResolvedKind = ComparisonKind.File;
                 foreach (var line in result.File.Lines)
                 {
                     FileDiffLines.Add(new DiffLineViewModel(line));
@@ -196,10 +187,10 @@ public sealed class MainViewModel : ViewModelBase
 
                 Summary = result.File.Summary;
                 StatusMessage = result.File.AreEqual ? "文件完全一致。" : "文件存在差异。";
+                SelectedTab = 1;
             }
             else if (result.Kind == ComparisonKind.Directory && result.Directory is not null)
             {
-                _autoResolvedKind = ComparisonKind.Directory;
                 _allDirectoryItems.Clear();
                 foreach (var item in result.Directory.Items)
                 {
@@ -208,6 +199,7 @@ public sealed class MainViewModel : ViewModelBase
 
                 Summary = $"新增 {result.Directory.Summary.Added} / 删除 {result.Directory.Summary.Removed} / 修改 {result.Directory.Summary.Modified} / 相同 {result.Directory.Summary.Same}";
                 StatusMessage = result.Directory.Items.Count == 0 ? "目录完全一致。" : "目录存在差异。";
+                SelectedTab = 0;
                 UpdateDirectoryCounts();
                 ApplyDirectoryFilter();
             }
@@ -225,8 +217,6 @@ public sealed class MainViewModel : ViewModelBase
             IsBusy = false;
             OnPropertyChanged(nameof(HasFileDiff));
             OnPropertyChanged(nameof(HasDirectoryDiff));
-            OnPropertyChanged(nameof(HasAutoFileDiff));
-            OnPropertyChanged(nameof(HasAutoDirectoryDiff));
         }
     }
 
@@ -235,8 +225,7 @@ public sealed class MainViewModel : ViewModelBase
         return SelectedTab switch
         {
             1 => CompareMode.File,
-            2 => CompareMode.Directory,
-            _ => CompareMode.Auto
+            _ => CompareMode.Directory
         };
     }
 
