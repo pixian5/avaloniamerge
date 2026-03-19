@@ -32,4 +32,4 @@ dotnet run --project /Users/x/code/avaloniamerge/AvaloniaMerge.Cli -- <left> <ri
 
 - 目录对比会包含子目录与空目录，并以目录树进行对比。
 - 二进制文件会逐字节对比并支持早停。
-- 发布默认采用框架依赖（运行时不打包进产物），需要安装 .NET 8 运行时。
+- 发布默认采用框架依赖（运行时不打包进产物），需要安装 .NET 10 运行时。
