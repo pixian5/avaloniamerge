@@ -26,12 +26,7 @@
                 </Grid>
 
                 <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
-                    <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                        <TextBlock Text="比较方法" VerticalAlignment="Center" />
-                        <ComboBox ItemsSource="{Binding DirectoryCompareMethods}" SelectedItem="{Binding SelectedDirectoryCompareMethod}" Width="160" />
-                        <CheckBox Content="忽略大小写" IsChecked="{Binding IgnoreCase}" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
-                    </StackPanel>
+                    <TextBlock Text="{Binding Summary}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
                     <Button Grid.Column="1" Content="交换" Classes="subtle" Click="OnSwap" />
                     <Button Grid.Column="2" Content="对比" Classes="primary" Click="OnCompare" />
                 </Grid>
@@ -45,10 +40,13 @@
                                     <StackPanel Orientation="Horizontal" Spacing="12">
                                         <TextBlock Text="筛选" VerticalAlignment="Center" />
                                         <ComboBox ItemsSource="{Binding DirectoryFilterOptions}" SelectedItem="{Binding DirectoryFilter}" Width="120" />
+                                        <TextBlock Text="比较方法" VerticalAlignment="Center" />
+                                        <ComboBox ItemsSource="{Binding DirectoryCompareMethods}" SelectedItem="{Binding SelectedDirectoryCompareMethod}" Width="160" />
                                         <TextBlock Text="搜索" VerticalAlignment="Center" />
                                         <TextBox Text="{Binding DirectorySearchText}" Width="200" Watermark="路径关键字" />
                                         <TextBlock Text="排序" VerticalAlignment="Center" />
                                         <ComboBox ItemsSource="{Binding DirectorySortOptions}" SelectedItem="{Binding DirectorySort}" Width="140" />
+                                        <CheckBox Content="忽略大小写" IsChecked="{Binding IgnoreCase}" VerticalAlignment="Center" />
                                         <CheckBox Content="降序" IsChecked="{Binding DirectorySortDescending}" VerticalAlignment="Center" />
                                         <TextBlock Text="{Binding DirectoryCountText}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
                                     </StackPanel>
