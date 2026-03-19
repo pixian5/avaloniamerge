@@ -20,6 +20,9 @@
         <SolidColorBrush x:Key="StatusRightBrush" Color="#FEE2E2" />
         <SolidColorBrush x:Key="StatusSameBrush" Color="#DCFCE7" />
         <SolidColorBrush x:Key="StatusDiffBrush" Color="#FEF3C7" />
+        <SolidColorBrush x:Key="ToastBackgroundBrush" Color="#163A39" />
+        <SolidColorBrush x:Key="ToastBorderBrush" Color="#2F6F69" />
+        <SolidColorBrush x:Key="ToastForegroundBrush" Color="#F8FAFC" />
     </Application.Resources>
 
     <Application.Styles>

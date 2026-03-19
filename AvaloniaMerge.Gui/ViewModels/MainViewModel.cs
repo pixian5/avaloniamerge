@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Threading;
 using AvaloniaMerge.Core;
 
 namespace AvaloniaMerge.Gui.ViewModels;
@@ -21,6 +22,7 @@ public sealed class MainViewModel : ViewModelBase
     private string _directoryCountText = "总数 0 | 相同 0 | 不同 0";
     private readonly List<DirectoryItemViewModel> _allDirectoryItems = new();
     private CompareMethodOption _selectedDirectoryCompareMethod;
+    private CancellationTokenSource? _toastCancellationTokenSource;
 
     public MainViewModel()
     {
@@ -70,6 +72,7 @@ public sealed class MainViewModel : ViewModelBase
             if (SetField(ref _statusMessage, value))
             {
                 OnPropertyChanged(nameof(HasStatusMessage));
+                ScheduleToastDismiss(value);
             }
         }
     }
@@ -195,6 +198,37 @@ public sealed class MainViewModel : ViewModelBase
     {
         get => _directoryCountText;
         private set => SetField(ref _directoryCountText, value);
+    }
+
+    private void ScheduleToastDismiss(string message)
+    {
+        _toastCancellationTokenSource?.Cancel();
+        _toastCancellationTokenSource?.Dispose();
+        _toastCancellationTokenSource = null;
+
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            return;
+        }
+
+        var cancellationTokenSource = new CancellationTokenSource();
+        _toastCancellationTokenSource = cancellationTokenSource;
+        _ = DismissToastAsync(cancellationTokenSource.Token);
+    }
+
+    private async Task DismissToastAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(2.4), cancellationToken);
+            if (!cancellationToken.IsCancellationRequested)
+            {
+                StatusMessage = string.Empty;
+            }
+        }
+        catch (TaskCanceledException)
+        {
+        }
     }
 
     public async Task CompareAsync()

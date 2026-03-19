@@ -25,9 +25,8 @@
                     <Button Grid.Row="1" Grid.Column="3" Content="目录" Classes="subtle" Click="OnBrowseRightFolder" />
                 </Grid>
 
-                <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="8">
-                    <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource MutedTextBrush}" IsVisible="{Binding HasStatusMessage}" />
-                    <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="10">
+                <Grid Grid.Row="1" RowDefinitions="*" RowSpacing="8">
+                    <Grid Grid.Row="0" RowDefinitions="Auto,*" RowSpacing="10">
                         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
                             <RadioButton Content="目录差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsDirectoryTabSelected}" />
                             <RadioButton Grid.Column="1" Content="文件差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsFileTabSelected}" />
@@ -114,6 +113,21 @@
                     </Grid>
                 </Grid>
             </Grid>
+        </Border>
+
+        <Border IsVisible="{Binding HasStatusMessage}"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Margin="0,8,8,0"
+                Padding="14,10"
+                CornerRadius="12"
+                Background="{DynamicResource ToastBackgroundBrush}"
+                BorderBrush="{DynamicResource ToastBorderBrush}"
+                BorderThickness="1"
+                MaxWidth="320">
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="{DynamicResource ToastForegroundBrush}"
+                       TextWrapping="Wrap" />
         </Border>
     </Grid>
 </Window>
