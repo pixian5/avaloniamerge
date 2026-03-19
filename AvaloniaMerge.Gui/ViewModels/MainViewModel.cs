@@ -2,12 +2,21 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Avalonia.Media;
 using AvaloniaMerge.Core;
 
 namespace AvaloniaMerge.Gui.ViewModels;
 
 public sealed class MainViewModel : ViewModelBase
 {
+    private enum ToastKind
+    {
+        Info,
+        Success,
+        Warning,
+        Error
+    }
+
     private string _leftPath = string.Empty;
     private string _rightPath = string.Empty;
     private bool _ignoreCase;
@@ -23,6 +32,7 @@ public sealed class MainViewModel : ViewModelBase
     private readonly List<DirectoryItemViewModel> _allDirectoryItems = new();
     private CompareMethodOption _selectedDirectoryCompareMethod;
     private CancellationTokenSource? _toastCancellationTokenSource;
+    private ToastKind _toastKind = ToastKind.Info;
 
     public MainViewModel()
     {
@@ -78,6 +88,24 @@ public sealed class MainViewModel : ViewModelBase
     }
 
     public bool HasStatusMessage => !string.IsNullOrWhiteSpace(StatusMessage);
+
+    public IBrush ToastBackgroundBrush => _toastKind switch
+    {
+        ToastKind.Success => new SolidColorBrush(Color.Parse("#14532D")),
+        ToastKind.Warning => new SolidColorBrush(Color.Parse("#7C2D12")),
+        ToastKind.Error => new SolidColorBrush(Color.Parse("#7F1D1D")),
+        _ => new SolidColorBrush(Color.Parse("#163A39"))
+    };
+
+    public IBrush ToastBorderBrush => _toastKind switch
+    {
+        ToastKind.Success => new SolidColorBrush(Color.Parse("#22C55E")),
+        ToastKind.Warning => new SolidColorBrush(Color.Parse("#F97316")),
+        ToastKind.Error => new SolidColorBrush(Color.Parse("#EF4444")),
+        _ => new SolidColorBrush(Color.Parse("#2F6F69"))
+    };
+
+    public IBrush ToastForegroundBrush => new SolidColorBrush(Color.Parse("#F8FAFC"));
 
     public string Summary
     {
@@ -216,6 +244,15 @@ public sealed class MainViewModel : ViewModelBase
         _ = DismissToastAsync(cancellationTokenSource.Token);
     }
 
+    private void ShowToast(string message, ToastKind toastKind = ToastKind.Info)
+    {
+        _toastKind = toastKind;
+        OnPropertyChanged(nameof(ToastBackgroundBrush));
+        OnPropertyChanged(nameof(ToastBorderBrush));
+        OnPropertyChanged(nameof(ToastForegroundBrush));
+        StatusMessage = message;
+    }
+
     private async Task DismissToastAsync(CancellationToken cancellationToken)
     {
         try
@@ -235,12 +272,12 @@ public sealed class MainViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(LeftPath) || string.IsNullOrWhiteSpace(RightPath))
         {
-            StatusMessage = "请先选择左右路径。";
+            ShowToast("请先选择左右路径。", ToastKind.Warning);
             return;
         }
 
         IsBusy = true;
-        StatusMessage = "正在对比...";
+        ShowToast("正在对比...");
         Summary = string.Empty;
         FileDiffLines.Clear();
         DirectoryItems.Clear();
@@ -267,7 +304,7 @@ public sealed class MainViewModel : ViewModelBase
                 }
 
                 Summary = result.File.Summary;
-                StatusMessage = result.File.AreEqual ? "文件完全一致。" : "文件存在差异。";
+                ShowToast(result.File.AreEqual ? "文件完全一致。" : "文件存在差异。", result.File.AreEqual ? ToastKind.Success : ToastKind.Warning);
                 SelectedTab = 1;
             }
             else if (result.Kind == ComparisonKind.Directory && result.Directory is not null)
@@ -279,19 +316,19 @@ public sealed class MainViewModel : ViewModelBase
                 }
 
                 Summary = $"新增 {result.Directory.Summary.Added} / 删除 {result.Directory.Summary.Removed} / 修改 {result.Directory.Summary.Modified} / 相同 {result.Directory.Summary.Same}";
-                StatusMessage = result.Directory.Items.Count == 0 ? "目录完全一致。" : "目录存在差异。";
+                ShowToast(result.Directory.Items.Count == 0 ? "目录完全一致。" : "目录存在差异。", result.Directory.Items.Count == 0 ? ToastKind.Success : ToastKind.Warning);
                 SelectedTab = 0;
                 UpdateDirectoryCounts();
                 ApplyDirectoryFilter();
             }
             else
             {
-                StatusMessage = "未能生成对比结果。";
+                ShowToast("未能生成对比结果。", ToastKind.Warning);
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = ex.Message;
+            ShowToast(ex.Message, ToastKind.Error);
         }
         finally
         {
@@ -319,13 +356,13 @@ public sealed class MainViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(LeftPath) || string.IsNullOrWhiteSpace(RightPath))
         {
-            StatusMessage = "请先选择左右路径。";
+            ShowToast("请先选择左右路径。", ToastKind.Warning);
             return;
         }
 
         if (!item.IsOnlyRight)
         {
-            StatusMessage = "仅右侧存在时才能复制到左侧。";
+            ShowToast("仅右侧存在时才能复制到左侧。", ToastKind.Warning);
             return;
         }
 
@@ -349,11 +386,11 @@ public sealed class MainViewModel : ViewModelBase
                 File.Copy(source, target, true);
             }
 
-            StatusMessage = "已复制到左侧。";
+            ShowToast("已复制到左侧。", ToastKind.Success);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"复制失败: {ex.Message}";
+            ShowToast($"复制失败: {ex.Message}", ToastKind.Error);
             return;
         }
 
@@ -364,13 +401,13 @@ public sealed class MainViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(RightPath))
         {
-            StatusMessage = "请先选择右侧路径。";
+            ShowToast("请先选择右侧路径。", ToastKind.Warning);
             return;
         }
 
         if (!item.IsOnlyRight)
         {
-            StatusMessage = "仅右侧存在时才能删除。";
+            ShowToast("仅右侧存在时才能删除。", ToastKind.Warning);
             return;
         }
 
@@ -387,11 +424,11 @@ public sealed class MainViewModel : ViewModelBase
                 File.Delete(target);
             }
 
-            StatusMessage = "已删除右侧条目。";
+            ShowToast("已删除右侧条目。", ToastKind.Success);
         }
         catch (Exception ex)
         {
-            StatusMessage = $"删除失败: {ex.Message}";
+            ShowToast($"删除失败: {ex.Message}", ToastKind.Error);
             return;
         }
 
@@ -402,7 +439,7 @@ public sealed class MainViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(LeftPath) || string.IsNullOrWhiteSpace(RightPath))
         {
-            StatusMessage = "请先选择左右路径。";
+            ShowToast("请先选择左右路径。", ToastKind.Warning);
             return;
         }
 
@@ -445,7 +482,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (string.IsNullOrWhiteSpace(LeftPath) || string.IsNullOrWhiteSpace(RightPath))
         {
-            StatusMessage = "请先选择左右路径。";
+            ShowToast("请先选择左右路径。", ToastKind.Warning);
             return;
         }
 
@@ -455,7 +492,7 @@ public sealed class MainViewModel : ViewModelBase
 
         if (!OpenPathIfExists(targetPath))
         {
-            StatusMessage = "目标不存在，无法打开。";
+            ShowToast("目标不存在，无法打开。", ToastKind.Error);
         }
     }
 

@@ -11,109 +11,107 @@
     </Design.DataContext>
 
     <Grid RowDefinitions="*" Margin="24">
-        <Border Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="18" Padding="20">
-            <Grid RowDefinitions="Auto,*" RowSpacing="16">
-                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" RowSpacing="10">
-                    <TextBlock Text="左侧路径" VerticalAlignment="Center" />
-                    <TextBox Grid.Column="1" Text="{Binding LeftPath}" Watermark="选择文件或目录" />
-                    <Button Grid.Column="2" Content="文件" Classes="subtle" Click="OnBrowseLeftFile" />
-                    <Button Grid.Column="3" Content="目录" Classes="subtle" Click="OnBrowseLeftFolder" />
+        <Grid RowDefinitions="Auto,*" RowSpacing="16">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" RowSpacing="10">
+                <TextBlock Text="左侧路径" VerticalAlignment="Center" />
+                <TextBox Grid.Column="1" Text="{Binding LeftPath}" Watermark="选择文件或目录" />
+                <Button Grid.Column="2" Content="文件" Classes="subtle" Click="OnBrowseLeftFile" />
+                <Button Grid.Column="3" Content="目录" Classes="subtle" Click="OnBrowseLeftFolder" />
 
-                    <TextBlock Grid.Row="1" Text="右侧路径" VerticalAlignment="Center" />
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RightPath}" Watermark="选择文件或目录" />
-                    <Button Grid.Row="1" Grid.Column="2" Content="文件" Classes="subtle" Click="OnBrowseRightFile" />
-                    <Button Grid.Row="1" Grid.Column="3" Content="目录" Classes="subtle" Click="OnBrowseRightFolder" />
-                </Grid>
+                <TextBlock Grid.Row="1" Text="右侧路径" VerticalAlignment="Center" />
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding RightPath}" Watermark="选择文件或目录" />
+                <Button Grid.Row="1" Grid.Column="2" Content="文件" Classes="subtle" Click="OnBrowseRightFile" />
+                <Button Grid.Row="1" Grid.Column="3" Content="目录" Classes="subtle" Click="OnBrowseRightFolder" />
+            </Grid>
 
-                <Grid Grid.Row="1" RowDefinitions="*" RowSpacing="8">
-                    <Grid Grid.Row="0" RowDefinitions="Auto,*" RowSpacing="10">
-                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
-                            <RadioButton Content="目录差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsDirectoryTabSelected}" />
-                            <RadioButton Grid.Column="1" Content="文件差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsFileTabSelected}" />
-                            <TextBlock Grid.Column="2" Text="{Binding Summary}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" IsVisible="{Binding HasSummary}" />
-                            <Button Grid.Column="3" Content="交换" Classes="subtle" Click="OnSwap" />
-                            <Button Grid.Column="4" Content="对比" Classes="primary" Click="OnCompare" />
-                        </Grid>
+            <Grid Grid.Row="1" RowDefinitions="*" RowSpacing="8">
+                <Grid Grid.Row="0" RowDefinitions="Auto,*" RowSpacing="10">
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                        <RadioButton Content="目录差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsDirectoryTabSelected}" />
+                        <RadioButton Grid.Column="1" Content="文件差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsFileTabSelected}" />
+                        <TextBlock Grid.Column="2" Text="{Binding Summary}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" IsVisible="{Binding HasSummary}" />
+                        <Button Grid.Column="3" Content="交换" Classes="subtle" Click="OnSwap" />
+                        <Button Grid.Column="4" Content="对比" Classes="primary" Click="OnCompare" />
+                    </Grid>
 
-                        <Grid Grid.Row="1">
-                            <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12" IsVisible="{Binding IsDirectoryTabSelected}">
-                                <Grid RowDefinitions="Auto,*" RowSpacing="12">
-                                    <WrapPanel Orientation="Horizontal" ItemWidth="NaN">
-                                        <TextBlock Text="筛选" VerticalAlignment="Center" />
-                                        <ComboBox ItemsSource="{Binding DirectoryFilterOptions}" SelectedItem="{Binding DirectoryFilter}" Width="120" />
-                                        <TextBlock Text="比较方法" VerticalAlignment="Center" />
-                                        <ComboBox ItemsSource="{Binding DirectoryCompareMethods}" SelectedItem="{Binding SelectedDirectoryCompareMethod}" Width="160" />
-                                        <TextBlock Text="搜索" VerticalAlignment="Center" />
-                                        <TextBox Text="{Binding DirectorySearchText}" Width="200" Watermark="路径关键字" />
-                                        <TextBlock Text="排序" VerticalAlignment="Center" />
-                                        <ComboBox ItemsSource="{Binding DirectorySortOptions}" SelectedItem="{Binding DirectorySort}" Width="140" />
-                                        <CheckBox Content="忽略大小写" IsChecked="{Binding IgnoreCase}" VerticalAlignment="Center" />
-                                        <CheckBox Content="降序" IsChecked="{Binding DirectorySortDescending}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding DirectoryCountText}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
-                                    </WrapPanel>
+                    <Grid Grid.Row="1">
+                        <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12" IsVisible="{Binding IsDirectoryTabSelected}">
+                            <Grid RowDefinitions="Auto,*" RowSpacing="12">
+                                <WrapPanel Orientation="Horizontal" ItemWidth="NaN">
+                                    <TextBlock Text="筛选" VerticalAlignment="Center" />
+                                    <ComboBox ItemsSource="{Binding DirectoryFilterOptions}" SelectedItem="{Binding DirectoryFilter}" Width="120" />
+                                    <TextBlock Text="比较方法" VerticalAlignment="Center" />
+                                    <ComboBox ItemsSource="{Binding DirectoryCompareMethods}" SelectedItem="{Binding SelectedDirectoryCompareMethod}" Width="160" />
+                                    <TextBlock Text="搜索" VerticalAlignment="Center" />
+                                    <TextBox Text="{Binding DirectorySearchText}" Width="200" Watermark="路径关键字" />
+                                    <TextBlock Text="排序" VerticalAlignment="Center" />
+                                    <ComboBox ItemsSource="{Binding DirectorySortOptions}" SelectedItem="{Binding DirectorySort}" Width="140" />
+                                    <CheckBox Content="忽略大小写" IsChecked="{Binding IgnoreCase}" VerticalAlignment="Center" />
+                                    <CheckBox Content="降序" IsChecked="{Binding DirectorySortDescending}" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding DirectoryCountText}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" />
+                                </WrapPanel>
 
-                                    <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="6">
-                                        <Border Background="#F3F4F6" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="8,6">
-                                            <Grid ColumnDefinitions="2*,90,100,100,160,160" ColumnSpacing="8">
-                                                <TextBlock Text="路径" FontWeight="SemiBold" />
-                                                <TextBlock Grid.Column="1" Text="状态" FontWeight="SemiBold" />
-                                                <TextBlock Grid.Column="2" Text="左大小" FontWeight="SemiBold" />
-                                                <TextBlock Grid.Column="3" Text="右大小" FontWeight="SemiBold" />
-                                                <TextBlock Grid.Column="4" Text="左修改时间" FontWeight="SemiBold" />
-                                                <TextBlock Grid.Column="5" Text="右修改时间" FontWeight="SemiBold" />
-                                            </Grid>
-                                        </Border>
+                                <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="6">
+                                    <Border Background="#F3F4F6" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="8,6">
+                                        <Grid ColumnDefinitions="2*,90,100,100,160,160" ColumnSpacing="8">
+                                            <TextBlock Text="路径" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="1" Text="状态" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="2" Text="左大小" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="3" Text="右大小" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="4" Text="左修改时间" FontWeight="SemiBold" />
+                                            <TextBlock Grid.Column="5" Text="右修改时间" FontWeight="SemiBold" />
+                                        </Grid>
+                                    </Border>
 
-                                        <ScrollViewer Grid.Row="1">
-                                            <ItemsControl ItemsSource="{Binding DirectoryItems}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,0,0,8"
-                                                                DoubleTapped="OnDirectoryItemDoubleTapped">
-                                                            <Border.ContextMenu>
-                                                                <ContextMenu>
-                                                                    <MenuItem Header="复制到左侧" Click="OnCopyToLeft" Tag="{Binding}" IsVisible="{Binding IsOnlyRight}" />
-                                                                    <MenuItem Header="删除" Click="OnDeleteRight" Tag="{Binding}" IsVisible="{Binding IsOnlyRight}" />
-                                                                    <MenuItem Header="打开双方上级文件夹" Click="OnOpenParentFolders" Tag="{Binding}" />
-                                                                </ContextMenu>
-                                                            </Border.ContextMenu>
-                                                            <Grid ColumnDefinitions="2*,90,100,100,160,160" ColumnSpacing="8">
-                                                                <TextBlock Text="{Binding DisplayPath}" TextWrapping="Wrap" />
-                                                                <Border Grid.Column="1" Background="{Binding StatusBrush}" CornerRadius="6" Padding="6,2" HorizontalAlignment="Left">
-                                                                    <TextBlock Text="{Binding StatusLabel}" FontSize="12" />
-                                                                </Border>
-                                                                <TextBlock Grid.Column="2" Text="{Binding LeftSizeDisplay}" />
-                                                                <TextBlock Grid.Column="3" Text="{Binding RightSizeDisplay}" />
-                                                                <TextBlock Grid.Column="4" Text="{Binding LeftModifiedDisplay}" />
-                                                                <TextBlock Grid.Column="5" Text="{Binding RightModifiedDisplay}" />
-                                                            </Grid>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </ScrollViewer>
-                                    </Grid>
+                                    <ScrollViewer Grid.Row="1">
+                                        <ItemsControl ItemsSource="{Binding DirectoryItems}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="8" Padding="10,6" Margin="0,0,0,8"
+                                                            DoubleTapped="OnDirectoryItemDoubleTapped">
+                                                        <Border.ContextMenu>
+                                                            <ContextMenu>
+                                                                <MenuItem Header="复制到左侧" Click="OnCopyToLeft" Tag="{Binding}" IsVisible="{Binding IsOnlyRight}" />
+                                                                <MenuItem Header="删除" Click="OnDeleteRight" Tag="{Binding}" IsVisible="{Binding IsOnlyRight}" />
+                                                                <MenuItem Header="打开双方上级文件夹" Click="OnOpenParentFolders" Tag="{Binding}" />
+                                                            </ContextMenu>
+                                                        </Border.ContextMenu>
+                                                        <Grid ColumnDefinitions="2*,90,100,100,160,160" ColumnSpacing="8">
+                                                            <TextBlock Text="{Binding DisplayPath}" TextWrapping="Wrap" />
+                                                            <Border Grid.Column="1" Background="{Binding StatusBrush}" CornerRadius="6" Padding="6,2" HorizontalAlignment="Left">
+                                                                <TextBlock Text="{Binding StatusLabel}" FontSize="12" />
+                                                            </Border>
+                                                            <TextBlock Grid.Column="2" Text="{Binding LeftSizeDisplay}" />
+                                                            <TextBlock Grid.Column="3" Text="{Binding RightSizeDisplay}" />
+                                                            <TextBlock Grid.Column="4" Text="{Binding LeftModifiedDisplay}" />
+                                                            <TextBlock Grid.Column="5" Text="{Binding RightModifiedDisplay}" />
+                                                        </Grid>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
                                 </Grid>
-                            </Border>
+                            </Grid>
+                        </Border>
 
-                            <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12" IsVisible="{Binding IsFileTabSelected}">
-                                <ScrollViewer>
-                                    <ItemsControl ItemsSource="{Binding FileDiffLines}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Border Background="{Binding Background}" CornerRadius="6" Padding="8,4" Margin="0,0,0,6">
-                                                    <TextBlock Text="{Binding DisplayText}" Foreground="{Binding Foreground}" FontFamily="Menlo, Consolas, monospace" />
-                                                </Border>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </ScrollViewer>
-                            </Border>
-                        </Grid>
+                        <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12" IsVisible="{Binding IsFileTabSelected}">
+                            <ScrollViewer>
+                                <ItemsControl ItemsSource="{Binding FileDiffLines}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{Binding Background}" CornerRadius="6" Padding="8,4" Margin="0,0,0,6">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="{Binding Foreground}" FontFamily="Menlo, Consolas, monospace" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
                     </Grid>
                 </Grid>
             </Grid>
-        </Border>
+        </Grid>
 
         <Border IsVisible="{Binding HasStatusMessage}"
                 HorizontalAlignment="Right"
@@ -121,12 +119,12 @@
                 Margin="0,8,8,0"
                 Padding="14,10"
                 CornerRadius="12"
-                Background="{DynamicResource ToastBackgroundBrush}"
-                BorderBrush="{DynamicResource ToastBorderBrush}"
+                Background="{Binding ToastBackgroundBrush}"
+                BorderBrush="{Binding ToastBorderBrush}"
                 BorderThickness="1"
                 MaxWidth="320">
             <TextBlock Text="{Binding StatusMessage}"
-                       Foreground="{DynamicResource ToastForegroundBrush}"
+                       Foreground="{Binding ToastForegroundBrush}"
                        TextWrapping="Wrap" />
         </Border>
     </Grid>
