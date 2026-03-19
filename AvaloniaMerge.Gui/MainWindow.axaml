@@ -33,9 +33,16 @@
 
                 <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="8">
                     <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource MutedTextBrush}" IsVisible="{Binding HasStatusMessage}" />
-                    <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedTab}">
-                        <TabItem Header="目录差异">
-                            <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
+                    <Grid Grid.Row="1" RowDefinitions="Auto,*" RowSpacing="10">
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                            <RadioButton Content="目录差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsDirectoryTabSelected}" />
+                            <RadioButton Grid.Column="1" Content="文件差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsFileTabSelected}" />
+                            <Button Grid.Column="3" Content="交换" Classes="subtle" Click="OnSwap" />
+                            <Button Grid.Column="4" Content="对比" Classes="primary" Click="OnCompare" />
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12" IsVisible="{Binding IsDirectoryTabSelected}">
                                 <Grid RowDefinitions="Auto,*" RowSpacing="12">
                                     <WrapPanel Orientation="Horizontal" ItemWidth="NaN">
                                         <TextBlock Text="筛选" VerticalAlignment="Center" />
@@ -94,9 +101,8 @@
                                     </Grid>
                                 </Grid>
                             </Border>
-                        </TabItem>
-                        <TabItem Header="文件差异">
-                            <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12">
+
+                            <Border Background="White" BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="12" Padding="12" IsVisible="{Binding IsFileTabSelected}">
                                 <ScrollViewer>
                                     <ItemsControl ItemsSource="{Binding FileDiffLines}">
                                         <ItemsControl.ItemTemplate>
@@ -109,8 +115,8 @@
                                     </ItemsControl>
                                 </ScrollViewer>
                             </Border>
-                        </TabItem>
-                    </TabControl>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Grid>
         </Border>

@@ -51,5 +51,23 @@
         <Style Selector="TabItem">
             <Setter Property="Padding" Value="12,6" />
         </Style>
+        <Style Selector="RadioButton.tab">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0,2,0,10" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="#5F6368" />
+        </Style>
+        <Style Selector="RadioButton.tab /template/ ContentPresenter">
+            <Setter Property="Margin" Value="0" />
+        </Style>
+        <Style Selector="RadioButton.tab:checked">
+            <Setter Property="Foreground" Value="#111827" />
+        </Style>
+        <Style Selector="RadioButton.tab:checked /template/ Border#PART_Border">
+            <Setter Property="BorderThickness" Value="0,0,0,3" />
+            <Setter Property="BorderBrush" Value="#1D8CF8" />
+        </Style>
     </Application.Styles>
 </Application>

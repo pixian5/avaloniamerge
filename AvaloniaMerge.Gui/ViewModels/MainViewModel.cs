@@ -85,7 +85,14 @@ public sealed class MainViewModel : ViewModelBase
     public int SelectedTab
     {
         get => _selectedTab;
-        set => SetField(ref _selectedTab, value);
+        set
+        {
+            if (SetField(ref _selectedTab, value))
+            {
+                OnPropertyChanged(nameof(IsDirectoryTabSelected));
+                OnPropertyChanged(nameof(IsFileTabSelected));
+            }
+        }
     }
 
     public bool IsBusy
@@ -97,6 +104,30 @@ public sealed class MainViewModel : ViewModelBase
     public bool HasFileDiff => FileDiffLines.Count > 0;
 
     public bool HasDirectoryDiff => DirectoryItems.Count > 0;
+
+    public bool IsDirectoryTabSelected
+    {
+        get => SelectedTab == 0;
+        set
+        {
+            if (value)
+            {
+                SelectedTab = 0;
+            }
+        }
+    }
+
+    public bool IsFileTabSelected
+    {
+        get => SelectedTab == 1;
+        set
+        {
+            if (value)
+            {
+                SelectedTab = 1;
+            }
+        }
+    }
 
     public CompareMethodOption SelectedDirectoryCompareMethod
     {
