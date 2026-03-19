@@ -10,7 +10,7 @@ public sealed class MainViewModel : ViewModelBase
     private string _leftPath = string.Empty;
     private string _rightPath = string.Empty;
     private bool _ignoreCase;
-    private string _statusMessage = "请选择左右路径并开始对比。";
+    private string _statusMessage = string.Empty;
     private string _summary = string.Empty;
     private int _selectedTab;
     private bool _isBusy;
