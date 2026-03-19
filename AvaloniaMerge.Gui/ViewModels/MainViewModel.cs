@@ -68,7 +68,51 @@ public sealed class MainViewModel : ViewModelBase
     public CompareTargetOption SelectedCompareTarget
     {
         get => _selectedCompareTarget;
-        set => SetField(ref _selectedCompareTarget, value);
+        set
+        {
+            if (SetField(ref _selectedCompareTarget, value))
+            {
+                OnPropertyChanged(nameof(IsAutoCompareTarget));
+                OnPropertyChanged(nameof(IsFileCompareTarget));
+                OnPropertyChanged(nameof(IsDirectoryCompareTarget));
+            }
+        }
+    }
+
+    public bool IsAutoCompareTarget
+    {
+        get => SelectedCompareTarget.Mode == CompareMode.Auto;
+        set
+        {
+            if (value)
+            {
+                SelectedCompareTarget = CompareTargets[0];
+            }
+        }
+    }
+
+    public bool IsFileCompareTarget
+    {
+        get => SelectedCompareTarget.Mode == CompareMode.File;
+        set
+        {
+            if (value)
+            {
+                SelectedCompareTarget = CompareTargets[1];
+            }
+        }
+    }
+
+    public bool IsDirectoryCompareTarget
+    {
+        get => SelectedCompareTarget.Mode == CompareMode.Directory;
+        set
+        {
+            if (value)
+            {
+                SelectedCompareTarget = CompareTargets[2];
+            }
+        }
     }
 
     public bool IgnoreCase
