@@ -9,7 +9,6 @@ public sealed class MainViewModel : ViewModelBase
 {
     private string _leftPath = string.Empty;
     private string _rightPath = string.Empty;
-    private CompareTargetOption _selectedCompareTarget;
     private bool _ignoreCase;
     private string _statusMessage = "请选择左右路径并开始对比。";
     private string _summary = string.Empty;
@@ -22,15 +21,10 @@ public sealed class MainViewModel : ViewModelBase
     private string _directoryCountText = "总数 0 | 相同 0 | 不同 0";
     private readonly List<DirectoryItemViewModel> _allDirectoryItems = new();
     private CompareMethodOption _selectedDirectoryCompareMethod;
+    private ComparisonKind? _autoResolvedKind;
 
     public MainViewModel()
     {
-        CompareTargets = new List<CompareTargetOption>
-        {
-            new("自动识别", CompareMode.Auto),
-            new("文件差异", CompareMode.File),
-            new("目录差异", CompareMode.Directory)
-        };
         DirectoryFilterOptions = new List<string> { "不同", "全部", "相同", "新增", "删除", "修改", "类型" };
         DirectorySortOptions = new List<string> { "相对路径", "状态", "左大小", "右大小", "左修改时间", "右修改时间" };
         DirectoryCompareMethods = new List<CompareMethodOption>
@@ -40,11 +34,9 @@ public sealed class MainViewModel : ViewModelBase
             new("大小+修改时间", DirectoryCompareMethod.SizeAndModifiedTime),
             new("完整对比", DirectoryCompareMethod.Full)
         };
-        _selectedCompareTarget = CompareTargets[0];
         _selectedDirectoryCompareMethod = DirectoryCompareMethods.Last();
     }
 
-    public IReadOnlyList<CompareTargetOption> CompareTargets { get; }
     public IReadOnlyList<string> DirectoryFilterOptions { get; }
     public IReadOnlyList<string> DirectorySortOptions { get; }
     public IReadOnlyList<CompareMethodOption> DirectoryCompareMethods { get; }
@@ -63,56 +55,6 @@ public sealed class MainViewModel : ViewModelBase
     {
         get => _rightPath;
         set => SetField(ref _rightPath, value);
-    }
-
-    public CompareTargetOption SelectedCompareTarget
-    {
-        get => _selectedCompareTarget;
-        set
-        {
-            if (SetField(ref _selectedCompareTarget, value))
-            {
-                OnPropertyChanged(nameof(IsAutoCompareTarget));
-                OnPropertyChanged(nameof(IsFileCompareTarget));
-                OnPropertyChanged(nameof(IsDirectoryCompareTarget));
-            }
-        }
-    }
-
-    public bool IsAutoCompareTarget
-    {
-        get => SelectedCompareTarget.Mode == CompareMode.Auto;
-        set
-        {
-            if (value)
-            {
-                SelectedCompareTarget = CompareTargets[0];
-            }
-        }
-    }
-
-    public bool IsFileCompareTarget
-    {
-        get => SelectedCompareTarget.Mode == CompareMode.File;
-        set
-        {
-            if (value)
-            {
-                SelectedCompareTarget = CompareTargets[1];
-            }
-        }
-    }
-
-    public bool IsDirectoryCompareTarget
-    {
-        get => SelectedCompareTarget.Mode == CompareMode.Directory;
-        set
-        {
-            if (value)
-            {
-                SelectedCompareTarget = CompareTargets[2];
-            }
-        }
     }
 
     public bool IgnoreCase
@@ -148,6 +90,10 @@ public sealed class MainViewModel : ViewModelBase
     public bool HasFileDiff => FileDiffLines.Count > 0;
 
     public bool HasDirectoryDiff => DirectoryItems.Count > 0;
+
+    public bool HasAutoFileDiff => _autoResolvedKind == ComparisonKind.File && HasFileDiff;
+
+    public bool HasAutoDirectoryDiff => _autoResolvedKind == ComparisonKind.Directory && HasDirectoryDiff;
 
     public CompareMethodOption SelectedDirectoryCompareMethod
     {
@@ -223,9 +169,12 @@ public sealed class MainViewModel : ViewModelBase
         FileDiffLines.Clear();
         DirectoryItems.Clear();
         _allDirectoryItems.Clear();
+        _autoResolvedKind = null;
         DirectoryCountText = "总数 0 | 相同 0 | 不同 0";
         OnPropertyChanged(nameof(HasFileDiff));
         OnPropertyChanged(nameof(HasDirectoryDiff));
+        OnPropertyChanged(nameof(HasAutoFileDiff));
+        OnPropertyChanged(nameof(HasAutoDirectoryDiff));
 
         try
         {
@@ -235,10 +184,11 @@ public sealed class MainViewModel : ViewModelBase
                 DirectoryCompareMethod = SelectedDirectoryCompareMethod.Method
             };
 
-            var result = await Task.Run(() => DiffEngine.Compare(LeftPath, RightPath, SelectedCompareTarget.Mode, options));
+            var result = await Task.Run(() => DiffEngine.Compare(LeftPath, RightPath, GetRequestedCompareMode(), options));
 
             if (result.Kind == ComparisonKind.File && result.File is not null)
             {
+                _autoResolvedKind = ComparisonKind.File;
                 foreach (var line in result.File.Lines)
                 {
                     FileDiffLines.Add(new DiffLineViewModel(line));
@@ -246,10 +196,10 @@ public sealed class MainViewModel : ViewModelBase
 
                 Summary = result.File.Summary;
                 StatusMessage = result.File.AreEqual ? "文件完全一致。" : "文件存在差异。";
-                SelectedTab = 0;
             }
             else if (result.Kind == ComparisonKind.Directory && result.Directory is not null)
             {
+                _autoResolvedKind = ComparisonKind.Directory;
                 _allDirectoryItems.Clear();
                 foreach (var item in result.Directory.Items)
                 {
@@ -258,7 +208,6 @@ public sealed class MainViewModel : ViewModelBase
 
                 Summary = $"新增 {result.Directory.Summary.Added} / 删除 {result.Directory.Summary.Removed} / 修改 {result.Directory.Summary.Modified} / 相同 {result.Directory.Summary.Same}";
                 StatusMessage = result.Directory.Items.Count == 0 ? "目录完全一致。" : "目录存在差异。";
-                SelectedTab = 1;
                 UpdateDirectoryCounts();
                 ApplyDirectoryFilter();
             }
@@ -276,7 +225,19 @@ public sealed class MainViewModel : ViewModelBase
             IsBusy = false;
             OnPropertyChanged(nameof(HasFileDiff));
             OnPropertyChanged(nameof(HasDirectoryDiff));
+            OnPropertyChanged(nameof(HasAutoFileDiff));
+            OnPropertyChanged(nameof(HasAutoDirectoryDiff));
         }
+    }
+
+    private CompareMode GetRequestedCompareMode()
+    {
+        return SelectedTab switch
+        {
+            1 => CompareMode.File,
+            2 => CompareMode.Directory,
+            _ => CompareMode.Auto
+        };
     }
 
     public void SwapPaths()
@@ -541,20 +502,6 @@ public sealed class MainViewModel : ViewModelBase
 
         public string DisplayName { get; }
         public DirectoryCompareMethod Method { get; }
-
-        public override string ToString() => DisplayName;
-    }
-
-    public sealed class CompareTargetOption
-    {
-        public CompareTargetOption(string displayName, CompareMode mode)
-        {
-            DisplayName = displayName;
-            Mode = mode;
-        }
-
-        public string DisplayName { get; }
-        public CompareMode Mode { get; }
 
         public override string ToString() => DisplayName;
     }

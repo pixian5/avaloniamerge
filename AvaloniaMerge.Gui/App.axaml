@@ -40,16 +40,6 @@
             <Setter Property="Background" Value="#EEF2F3" />
             <Setter Property="Foreground" Value="#243030" />
         </Style>
-        <Style Selector="RadioButton.mode-button">
-            <Setter Property="Background" Value="#EEF2F3" />
-            <Setter Property="Foreground" Value="#243030" />
-            <Setter Property="CornerRadius" Value="999" />
-            <Setter Property="Padding" Value="12,8" />
-        </Style>
-        <Style Selector="RadioButton.mode-button:checked">
-            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
-            <Setter Property="Foreground" Value="White" />
-        </Style>
         <Style Selector="TextBox">
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Padding" Value="10,6" />
