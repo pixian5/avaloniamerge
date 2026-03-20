@@ -82,7 +82,6 @@ public sealed class MainViewModel : ViewModelBase
             if (SetField(ref _statusMessage, value))
             {
                 OnPropertyChanged(nameof(HasStatusMessage));
-                ScheduleToastDismiss(value);
             }
         }
     }
@@ -250,6 +249,7 @@ public sealed class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(ToastBackgroundBrush));
         OnPropertyChanged(nameof(ToastBorderBrush));
         OnPropertyChanged(nameof(ToastForegroundBrush));
+        ScheduleToastDismiss(message);
         StatusMessage = message;
     }
 
@@ -268,7 +268,7 @@ public sealed class MainViewModel : ViewModelBase
         }
     }
 
-    public async Task CompareAsync()
+    public async Task CompareAsync(bool notify = true)
     {
         if (string.IsNullOrWhiteSpace(LeftPath) || string.IsNullOrWhiteSpace(RightPath))
         {
@@ -277,7 +277,10 @@ public sealed class MainViewModel : ViewModelBase
         }
 
         IsBusy = true;
-        ShowToast("正在对比...");
+        if (notify)
+        {
+            ShowToast("正在对比...");
+        }
         Summary = string.Empty;
         FileDiffLines.Clear();
         DirectoryItems.Clear();
@@ -304,7 +307,10 @@ public sealed class MainViewModel : ViewModelBase
                 }
 
                 Summary = result.File.Summary;
-                ShowToast(result.File.AreEqual ? "文件完全一致。" : "文件存在差异。", result.File.AreEqual ? ToastKind.Success : ToastKind.Warning);
+                if (notify)
+                {
+                    ShowToast(result.File.AreEqual ? "文件完全一致。" : "文件存在差异。", result.File.AreEqual ? ToastKind.Success : ToastKind.Warning);
+                }
                 SelectedTab = 1;
             }
             else if (result.Kind == ComparisonKind.Directory && result.Directory is not null)
@@ -316,14 +322,20 @@ public sealed class MainViewModel : ViewModelBase
                 }
 
                 Summary = $"新增 {result.Directory.Summary.Added} / 删除 {result.Directory.Summary.Removed} / 修改 {result.Directory.Summary.Modified} / 相同 {result.Directory.Summary.Same}";
-                ShowToast(result.Directory.Items.Count == 0 ? "目录完全一致。" : "目录存在差异。", result.Directory.Items.Count == 0 ? ToastKind.Success : ToastKind.Warning);
+                if (notify)
+                {
+                    ShowToast(result.Directory.Items.Count == 0 ? "目录完全一致。" : "目录存在差异。", result.Directory.Items.Count == 0 ? ToastKind.Success : ToastKind.Warning);
+                }
                 SelectedTab = 0;
                 UpdateDirectoryCounts();
                 ApplyDirectoryFilter();
             }
             else
             {
-                ShowToast("未能生成对比结果。", ToastKind.Warning);
+                if (notify)
+                {
+                    ShowToast("未能生成对比结果。", ToastKind.Warning);
+                }
             }
         }
         catch (Exception ex)
@@ -394,7 +406,7 @@ public sealed class MainViewModel : ViewModelBase
             return;
         }
 
-        await CompareAsync();
+        await CompareAsync(false);
     }
 
     public async Task DeleteRightAsync(DirectoryItemViewModel item)
@@ -432,7 +444,7 @@ public sealed class MainViewModel : ViewModelBase
             return;
         }
 
-        await CompareAsync();
+        await CompareAsync(false);
     }
 
     public void OpenParentFolders(DirectoryItemViewModel item)
