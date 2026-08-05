@@ -136,8 +136,16 @@ public sealed class MainViewModel : ViewModelBase
     public bool IsBusy
     {
         get => _isBusy;
-        set => SetField(ref _isBusy, value);
+        set
+        {
+            if (SetField(ref _isBusy, value))
+            {
+                OnPropertyChanged(nameof(IsIdle));
+            }
+        }
     }
+
+    public bool IsIdle => !IsBusy;
 
     public bool HasFileDiff => FileDiffLines.Count > 0;
 
@@ -276,6 +284,25 @@ public sealed class MainViewModel : ViewModelBase
             return;
         }
 
+        if (IsBusy)
+        {
+            if (notify)
+            {
+                ShowToast("正在对比，请稍候。", ToastKind.Info);
+            }
+
+            return;
+        }
+
+        var leftPath = LeftPath;
+        var rightPath = RightPath;
+        var requestedMode = GetRequestedCompareMode();
+        var options = new DiffOptions
+        {
+            IgnoreCase = IgnoreCase,
+            DirectoryCompareMethod = SelectedDirectoryCompareMethod.Method
+        };
+
         IsBusy = true;
         if (notify)
         {
@@ -291,13 +318,7 @@ public sealed class MainViewModel : ViewModelBase
 
         try
         {
-            var options = new DiffOptions
-            {
-                IgnoreCase = IgnoreCase,
-                DirectoryCompareMethod = SelectedDirectoryCompareMethod.Method
-            };
-
-            var result = await Task.Run(() => DiffEngine.Compare(LeftPath, RightPath, GetRequestedCompareMode(), options));
+            var result = await Task.Run(() => DiffEngine.Compare(leftPath, rightPath, requestedMode, options));
 
             if (result.Kind == ComparisonKind.File && result.File is not null)
             {
@@ -321,10 +342,14 @@ public sealed class MainViewModel : ViewModelBase
                     _allDirectoryItems.Add(new DirectoryItemViewModel(item));
                 }
 
-                Summary = $"新增 {result.Directory.Summary.Added} / 删除 {result.Directory.Summary.Removed} / 修改 {result.Directory.Summary.Modified} / 相同 {result.Directory.Summary.Same}";
+                Summary = $"新增 {result.Directory.Summary.Added} / 删除 {result.Directory.Summary.Removed} / 修改 {result.Directory.Summary.Modified} / 类型 {result.Directory.Summary.TypeChanged} / 相同 {result.Directory.Summary.Same}";
                 if (notify)
                 {
-                    ShowToast(result.Directory.Items.Count == 0 ? "目录完全一致。" : "目录存在差异。", result.Directory.Items.Count == 0 ? ToastKind.Success : ToastKind.Warning);
+                    var hasDifference = result.Directory.Summary.Added > 0 ||
+                        result.Directory.Summary.Removed > 0 ||
+                        result.Directory.Summary.Modified > 0 ||
+                        result.Directory.Summary.TypeChanged > 0;
+                    ShowToast(hasDifference ? "目录存在差异。" : "目录完全一致。", hasDifference ? ToastKind.Warning : ToastKind.Success);
                 }
                 SelectedTab = 0;
                 UpdateDirectoryCounts();
@@ -542,20 +567,37 @@ public sealed class MainViewModel : ViewModelBase
             return false;
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        try
         {
-            Process.Start("open", path);
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
-        }
-        else
-        {
-            Process.Start("xdg-open", path);
-        }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "open",
+                    UseShellExecute = false,
+                    ArgumentList = { path }
+                });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            }
+            else
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "xdg-open",
+                    UseShellExecute = false,
+                    ArgumentList = { path }
+                });
+            }
 
-        return true;
+            return true;
+        }
+        catch (Exception ex) when (ex is InvalidOperationException or System.ComponentModel.Win32Exception)
+        {
+            return false;
+        }
     }
 
     private void UpdateDirectoryCounts()

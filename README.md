@@ -25,8 +25,17 @@ dotnet run --project /Users/x/code/avaloniamerge/AvaloniaMerge.Cli -- <left> <ri
 - `--file` 强制文件对比
 - `--dir` 强制目录对比
 - `--ignore-case` 忽略大小写
+- `--method <name>` 目录文件比较方法：`exists`、`size`、`time`、`full`
 - `--json` 输出 JSON
 - `--out <path>` 输出到文件
+
+CLI 返回码：`0` 表示完全一致，`1` 表示存在差异，`2` 表示运行失败。
+
+## 测试
+
+```bash
+dotnet run --project /Users/x/code/avaloniamerge/AvaloniaMerge.Tests -c Release
+```
 
 ## 说明
 

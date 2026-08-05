@@ -10,10 +10,17 @@
 !AvaloniaMerge.Cli/**
 !AvaloniaMerge.Gui/
 !AvaloniaMerge.Gui/**
+!AvaloniaMerge.Tests/
+!AvaloniaMerge.Tests/**
+!docs/
+!docs/**
+!VERSION
 AvaloniaMerge.Core/**/bin/
 AvaloniaMerge.Core/**/obj/
 AvaloniaMerge.Cli/**/bin/
 AvaloniaMerge.Cli/**/obj/
 AvaloniaMerge.Gui/**/bin/
 AvaloniaMerge.Gui/**/obj/
+AvaloniaMerge.Tests/**/bin/
+AvaloniaMerge.Tests/**/obj/
 **/.DS_Store

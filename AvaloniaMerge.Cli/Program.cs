@@ -25,7 +25,8 @@ internal static class Program
 
         var diffOptions = new DiffOptions
         {
-            IgnoreCase = options.IgnoreCase
+            IgnoreCase = options.IgnoreCase,
+            DirectoryCompareMethod = options.DirectoryCompareMethod
         };
 
         try
@@ -44,7 +45,7 @@ internal static class Program
                 Console.WriteLine(output);
             }
 
-            return 0;
+            return IsEqual(result) ? 0 : 1;
         }
         catch (Exception ex)
         {
@@ -61,6 +62,22 @@ internal static class Program
             ComparisonKind.Directory when result.Directory is not null => FormatDirectoryDiff(result.Directory, leftPath, rightPath),
             _ => "没有可输出的对比结果。"
         };
+    }
+
+    private static bool IsEqual(ComparisonResult result)
+    {
+        if (result.File is not null)
+        {
+            return result.File.AreEqual;
+        }
+
+        if (result.Directory is not null)
+        {
+            var summary = result.Directory.Summary;
+            return summary.Added == 0 && summary.Removed == 0 && summary.Modified == 0 && summary.TypeChanged == 0;
+        }
+
+        return false;
     }
 
     private static string FormatFileDiff(FileDiffResult result, string leftPath, string rightPath)
@@ -97,7 +114,7 @@ internal static class Program
     {
         var builder = new StringBuilder();
         builder.AppendLine($"目录对比: {leftPath} ↔ {rightPath}");
-        builder.AppendLine($"+{result.Summary.Added} -{result.Summary.Removed} ~{result.Summary.Modified} ={result.Summary.Same}");
+        builder.AppendLine($"+{result.Summary.Added} -{result.Summary.Removed} ~{result.Summary.Modified} ={result.Summary.Same} 类型 {result.Summary.TypeChanged}");
         builder.AppendLine(new string('-', 72));
         builder.AppendLine("状态    路径");
 
@@ -129,6 +146,7 @@ internal static class Program
   --file           强制以文件模式对比
   --dir            强制以目录模式对比
   --ignore-case    忽略大小写
+  --method <name>  目录文件比较方法: exists, size, time, full
   --json           输出 JSON
   --out <path>     输出到文件
   -h | --help      显示帮助
@@ -138,6 +156,7 @@ internal static class Program
         public bool IgnoreCase { get; private set; }
         public bool Json { get; private set; }
         public bool ShowHelp { get; private set; }
+        public DirectoryCompareMethod DirectoryCompareMethod { get; private set; } = DirectoryCompareMethod.Full;
         public string? OutputPath { get; private set; }
         public string? LeftPath { get; private set; }
         public string? RightPath { get; private set; }
@@ -162,6 +181,36 @@ internal static class Program
                     case "--ignore-case":
                         options.IgnoreCase = true;
                         break;
+                    case "--method":
+                        if (i + 1 >= args.Length)
+                        {
+                            error = "--method 需要指定 exists、size、time 或 full。";
+                            return options;
+                        }
+
+                        var method = args[++i].ToLowerInvariant();
+                        if (method == "exists")
+                        {
+                            options.DirectoryCompareMethod = DirectoryCompareMethod.Exists;
+                        }
+                        else if (method == "size")
+                        {
+                            options.DirectoryCompareMethod = DirectoryCompareMethod.Size;
+                        }
+                        else if (method == "time")
+                        {
+                            options.DirectoryCompareMethod = DirectoryCompareMethod.SizeAndModifiedTime;
+                        }
+                        else if (method == "full")
+                        {
+                            options.DirectoryCompareMethod = DirectoryCompareMethod.Full;
+                        }
+                        else
+                        {
+                            error = "--method 只支持 exists、size、time 或 full。";
+                            return options;
+                        }
+                        break;
                     case "--json":
                         options.Json = true;
                         break;
@@ -178,14 +227,20 @@ internal static class Program
                         options.ShowHelp = true;
                         return options;
                     default:
+                        if (arg.StartsWith("-", StringComparison.Ordinal))
+                        {
+                            error = $"未知选项: {arg}";
+                            return options;
+                        }
+
                         positional.Add(arg);
                         break;
                 }
             }
 
-            if (positional.Count < 2)
+            if (positional.Count != 2)
             {
-                error = "需要提供左右两个路径。";
+                error = positional.Count < 2 ? "需要提供左右两个路径。" : "只能提供左右两个路径。";
                 return options;
             }
 

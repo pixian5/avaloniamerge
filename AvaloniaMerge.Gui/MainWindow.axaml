@@ -12,7 +12,7 @@
 
     <Grid RowDefinitions="*" Margin="24">
         <Grid RowDefinitions="Auto,*" RowSpacing="16">
-            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" RowSpacing="10">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="12" RowSpacing="10" IsEnabled="{Binding IsIdle}">
                 <TextBlock Text="左侧路径" VerticalAlignment="Center" />
                 <TextBox Grid.Column="1" Text="{Binding LeftPath}" Watermark="选择文件或目录" />
                 <Button Grid.Column="2" Content="文件" Classes="subtle" Click="OnBrowseLeftFile" />
@@ -27,11 +27,11 @@
             <Grid Grid.Row="1" RowDefinitions="*" RowSpacing="8">
                 <Grid Grid.Row="0" RowDefinitions="Auto,*" RowSpacing="10">
                     <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" ColumnSpacing="12" VerticalAlignment="Center">
-                        <RadioButton Content="目录差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsDirectoryTabSelected}" />
-                        <RadioButton Grid.Column="1" Content="文件差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsFileTabSelected}" />
+                        <RadioButton Content="目录差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsDirectoryTabSelected}" IsEnabled="{Binding IsIdle}" />
+                        <RadioButton Grid.Column="1" Content="文件差异" Classes="tab" GroupName="CompareTab" IsChecked="{Binding IsFileTabSelected}" IsEnabled="{Binding IsIdle}" />
                         <TextBlock Grid.Column="2" Text="{Binding Summary}" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" HorizontalAlignment="Right" IsVisible="{Binding HasSummary}" />
-                        <Button Grid.Column="3" Content="交换" Classes="subtle" Click="OnSwap" />
-                        <Button Grid.Column="4" Content="对比" Classes="primary" Click="OnCompare" />
+                        <Button Grid.Column="3" Content="交换" Classes="subtle" Click="OnSwap" IsEnabled="{Binding IsIdle}" />
+                        <Button Grid.Column="4" Content="对比" Classes="primary" Click="OnCompare" IsEnabled="{Binding IsIdle}" />
                     </Grid>
 
                     <Grid Grid.Row="1">
